@@ -5,7 +5,7 @@ if 'current_index' not in st.session_state:
 import files.sessionvariables
 from files.dfops import rename_columns, split_timestamp_column, add_columns
 from files.dfops import trim_df,reset_idex,get_row_numbers
-from files.plotylyfig import chart_rsi
+from files.plotlyfig import chart_rsi
 from files.generateui import slice_df, get_text_data
 from files.counter import make_date_range_list, move_counter
 
