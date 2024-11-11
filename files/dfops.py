@@ -9,6 +9,7 @@ def rename_columns(df):
 
     df.rename(columns={ df.columns[5]: "RSI" }, inplace=True)
     df.rename(columns={ df.columns[6]: "SMA21" }, inplace=True)
+    df.rename(columns={ df.columns[7]: "SMA13" }, inplace=True)
 
     return df
 
