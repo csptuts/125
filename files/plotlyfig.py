@@ -26,6 +26,12 @@ def chart_rsi():
     row=1, col=1)
 
     fig.add_trace(go.Scatter(x=df['OriginalTimeStamp'],
+                             y=df['SMA13'],
+                             line=dict(color='blue', width=0.2)
+                            ),
+    row=1, col=1)
+    
+    fig.add_trace(go.Scatter(x=df['OriginalTimeStamp'],
                              y=df['RSI'],
                              line=dict(color='green', width=2)
                             ),
