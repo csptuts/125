@@ -42,7 +42,7 @@ def get_text_data():
     
     df=st.session_state.sliced_df.tail(1)
 
-    st.dataframe(df)
+    
     original_timestamp=str(df.iloc[0]['OriginalTimeStamp'])
     original_timestamp = original_timestamp[:15]
     
