@@ -36,10 +36,7 @@ with st.sidebar:
             df=reset_idex(df)
             st.session_state.base_df = df
             make_date_range_list(df)
-            st.write(st.session_state.counter_list)
-            st.dataframe(st.session_state.base_df)
-            st.write(st.session_state.current_index)
-            st.write('Data submitted sucessfully')
+           
 
 if st.button('Start Simulation'):
     move_counter()
