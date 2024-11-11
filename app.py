@@ -1,0 +1,59 @@
+import streamlit as st
+import pandas as pd
+if 'current_index' not in st.session_state:
+    st.session_state.current_index = 0
+import files.sessionvariables
+from files.dfops import rename_columns, split_timestamp_column, add_columns
+from files.dfops import trim_df,reset_idex,get_row_numbers
+from files.plotylyfig import chart_rsi
+from files.generateui import slice_df, get_text_data
+from files.counter import make_date_range_list, move_counter
+
+with st.sidebar:
+    
+    uploaded_file = st.file_uploader("Upload 125min data file")
+    
+    if uploaded_file is not None:
+        df = pd.read_csv(uploaded_file)
+        
+        df=rename_columns(df)
+        df=split_timestamp_column(df)
+        df=add_columns(df)
+        
+with st.sidebar:
+    with st.form("Please Enter Dates"):
+        
+        start_date = st.date_input("Start Date",value=None)
+        end_date = st.date_input("End Date",value=None)
+
+        # Every form must have a submit button.
+        submitted = st.form_submit_button("Submit")
+        if submitted:
+            st.session_state.start_date = start_date
+            st.session_state.end_date = end_date
+
+            df=trim_df(df)
+            df=reset_idex(df)
+            st.session_state.base_df = df
+            make_date_range_list(df)
+            st.write(st.session_state.counter_list)
+            st.dataframe(st.session_state.base_df)
+            st.write(st.session_state.current_index)
+            st.write('Data submitted sucessfully')
+
+if st.button('Start Simulation'):
+    move_counter()
+    slice_df()
+    if st.session_state.stp == 0:
+        original_timestamp,rsi_value,current_time, market_condition = get_text_data()
+        col1, col2 = st.columns([4, 1])
+        fig=chart_rsi()
+        with col1:
+            st.plotly_chart(fig)
+        with col2:
+            st.metric("Date", original_timestamp)
+            st.metric("Current Time", current_time)
+            st.metric("RSI Value", rsi_value)
+            st.metric("Market Condition", market_condition)
+    else:
+        st.header("End Date reached. Start Over")    
