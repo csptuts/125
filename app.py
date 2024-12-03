@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 if 'current_index' not in st.session_state:
     st.session_state.current_index = 0
+if 'stp' not in st.session_state:
+    st.session_state.stp = 0    
 import files.sessionvariables
 from files.dfops import rename_columns, split_timestamp_column, add_columns
 from files.dfops import trim_df,reset_idex,get_row_numbers
