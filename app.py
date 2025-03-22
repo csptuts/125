@@ -11,33 +11,69 @@ from files.plotlyfig import chart_rsi
 from files.generateui import slice_df, get_text_data
 from files.counter import make_date_range_list, move_counter
 
-with st.sidebar:
-    
-    uploaded_file = st.file_uploader("Upload 125min data file")
-    
-    if uploaded_file is not None:
-        df = pd.read_csv(uploaded_file)
-        
-        df=rename_columns(df)
-        df=split_timestamp_column(df)
-        df=add_columns(df)
-        
-with st.sidebar:
-    with st.form("Please Enter Dates"):
-        
-        start_date = st.date_input("Start Date",value=None)
-        end_date = st.date_input("End Date",value=None)
 
+with st.sidebar:
+    
+    uploaded_file_W = st.file_uploader("Upload W data file")
+    
+    if uploaded_file_W is not None:
+        dfW = pd.read_csv(uploaded_file_W)
+
+with st.sidebar:
+    
+    uploaded_file_125 = st.file_uploader("Upload 125 data file")
+    
+    if uploaded_file_125 is not None:
+        df125 = pd.read_csv(uploaded_file_125)
+
+
+with st.sidebar:
+    
+    uploaded_file_25 = st.file_uploader("Upload 25 data file")
+    
+    if uploaded_file_25 is not None:
+        df25 = pd.read_csv(uploaded_file_25)
+
+with st.sidebar:
+    with st.form("my_form"):
+        st.write("Inside the form")
+        dd = st.text_input("Insert a number", value=None, placeholder="Type a date...")
+        mm = st.text_input("Insert a number", value=None, placeholder="Type a month...")
+        yy = st.text_input("Insert a number", value=None, placeholder="Type a year...")
+        
         # Every form must have a submit button.
         submitted = st.form_submit_button("Submit")
         if submitted:
-            st.session_state.start_date = start_date
-            st.session_state.end_date = end_date
+            st.write(dd,mm,yy)
+    st.write("Outside the form")
 
-            df=trim_df(df)
-            df=reset_idex(df)
-            st.session_state.base_df = df
-            make_date_range_list(df)
+# with st.sidebar:
+    
+#     uploaded_file = st.file_uploader("Upload 125min data file")
+    
+#     if uploaded_file is not None:
+#         df = pd.read_csv(uploaded_file)
+        
+#         df=rename_columns(df)
+#         df=split_timestamp_column(df)
+#         df=add_columns(df)
+        
+# with st.sidebar:
+#     with st.form("Please Enter Dates"):
+        
+#         start_date = st.date_input("Start Date",value=None)
+#         end_date = st.date_input("End Date",value=None)
+
+#         # Every form must have a submit button.
+#         submitted = st.form_submit_button("Submit")
+#         if submitted:
+#             st.session_state.start_date = start_date
+#             st.session_state.end_date = end_date
+
+#             df=trim_df(df)
+#             df=reset_idex(df)
+#             st.session_state.base_df = df
+#             make_date_range_list(df)
            
 
 if st.button('Start Simulation'):
