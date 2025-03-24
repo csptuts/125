@@ -1,16 +1,13 @@
 import streamlit as st
 import pandas as pd
-if 'current_index' not in st.session_state:
-    st.session_state.current_index = 0
-if 'stp' not in st.session_state:
-    st.session_state.stp = 0    
-import files.sessionvariables
-from files.dfops import rename_columns, split_timestamp_column, add_columns
-from files.dfops import trim_df,reset_idex,get_row_numbers
-from files.plotlyfig import chart_rsi
-from files.generateui import slice_df, get_text_data
-from files.counter import make_date_range_list, move_counter
+from streamlit_shortcuts import button, add_keyboard_shortcuts
 
+from files.wops import get_unixts
+from files.coredf import get_df25, get_df125
+import files.sessionvars
+from files.plotlyfig import chart_25, show_initial_chart
+
+# st.title('Hello')
 
 with st.sidebar:
     
@@ -24,7 +21,7 @@ with st.sidebar:
     uploaded_file_125 = st.file_uploader("Upload 125 data file")
     
     if uploaded_file_125 is not None:
-        df125 = pd.read_csv(uploaded_file_125)
+        df125_0 = pd.read_csv(uploaded_file_125)
 
 
 with st.sidebar:
@@ -32,63 +29,115 @@ with st.sidebar:
     uploaded_file_25 = st.file_uploader("Upload 25 data file")
     
     if uploaded_file_25 is not None:
-        df25 = pd.read_csv(uploaded_file_25)
+        df25_0 = pd.read_csv(uploaded_file_25)
 
 with st.sidebar:
     with st.form("my_form"):
         st.write("Inside the form")
-        dd = st.text_input("Insert a number", value=None, placeholder="Type a date...")
-        mm = st.text_input("Insert a number", value=None, placeholder="Type a month...")
-        yy = st.text_input("Insert a number", value=None, placeholder="Type a year...")
+        d = st.text_input("Enter date")
+        m = st.text_input("Enter month")
+        y = st.text_input("Enter Year")
         
+
         # Every form must have a submit button.
         submitted = st.form_submit_button("Submit")
         if submitted:
-            st.write(dd,mm,yy)
-    st.write("Outside the form")
+            st.write(d,m,y)
+            d=int(d)
+            m=int(m)
+            y=int(y)
+            sorted_df=get_unixts(d,m,y,dfW)
+            sorted_df1=sorted_df[["TS-GMT","UNIXTS"]]
+            st.dataframe(sorted_df1)
 
-# with st.sidebar:
-    
-#     uploaded_file = st.file_uploader("Upload 125min data file")
-    
-#     if uploaded_file is not None:
-#         df = pd.read_csv(uploaded_file)
+
+
+
+
+with st.sidebar:
+    with st.form("my_form-1"):
+        st.write("Inside the form")
+        wk_unxts = st.text_input("Enter UNIXTS")
         
-#         df=rename_columns(df)
-#         df=split_timestamp_column(df)
-#         df=add_columns(df)
-        
-# with st.sidebar:
-#     with st.form("Please Enter Dates"):
-        
-#         start_date = st.date_input("Start Date",value=None)
-#         end_date = st.date_input("End Date",value=None)
 
-#         # Every form must have a submit button.
-#         submitted = st.form_submit_button("Submit")
-#         if submitted:
-#             st.session_state.start_date = start_date
-#             st.session_state.end_date = end_date
+        # Every form must have a submit button.
+        submitted = st.form_submit_button("Submit")
+        if submitted:
+            st.write(wk_unxts)
+            wk_unxts=int(wk_unxts)
+            df25=get_df25(wk_unxts,df25_0)
+            df125=get_df125(wk_unxts,df125_0)
+            plot_data=pd.merge_asof(df25,df125,left_index=True,right_index=True)
+            plot_data['60rsi'] = 60
+            plot_data['40rsi'] = 40
+            unique_values = plot_data['IsoWeekNum'].unique()
+            st.write(unique_values)
+            wa=unique_values[0]
+            wb=unique_values[1]
+            grp=plot_data.groupby('IsoWeekNum')
+            grpa=grp.get_group(wa)
+            grpb=grp.get_group(wb)
+            ia=grpa.index[0]
+            ib=grpb.index[0]
+            if ia>ib:
+                st.session_state.df1=grpb
+                st.session_state.df2=grpa
+            else:
+                st.session_state.df1=grpa
+                st.session_state.df2=grpb
+            st.session_state.switch ='show'
+            # st.session_state.df25=get_df25(wk_unxts,df25_0)
+            # st.session_state.df125=get_df125(wk_unxts,df125_0)
+            # sorted_df1=sorted_df[["TS-GMT","UNIXTS"]]
+            # st.dataframe(sorted_df1)
 
-#             df=trim_df(df)
-#             df=reset_idex(df)
-#             st.session_state.base_df = df
-#             make_date_range_list(df)
-           
 
-if st.button('Start Simulation'):
-    move_counter()
-    slice_df()
-    if st.session_state.stp == 0:
-        original_timestamp,rsi_value,current_time, market_condition = get_text_data()
-        col1, col2 = st.columns([4, 1])
-        fig=chart_rsi()
-        with col1:
-            st.plotly_chart(fig)
-        with col2:
-            st.metric("Date", original_timestamp)
-            st.metric("Current Time", current_time)
-            st.metric("RSI Value", rsi_value)
-            st.metric("Market Condition", market_condition)
+
+
+# if st.button("Initialise"):
+#     # st.dataframe(st.session_state.df1)
+#     # st.dataframe(st.session_state.df2)
+#     fig=chart_25(st.session_state.df1)
+#     st.plotly_chart(fig)
+
+def greet():
+    st.session_state.total_rows= len(st.session_state.df2)
+    st.write(st.session_state.total_rows)
+    st.session_state.row_num = st.session_state.row_num + 1
+    if st.session_state.row_num <= st.session_state.total_rows:
+        sliced_df = st.session_state.df2.head(st.session_state.row_num)
+        plot_df=pd.concat([st.session_state.df1,sliced_df], axis=0)
+        fig=chart_25(plot_df)
+        st.plotly_chart(fig)
     else:
-        st.header("End Date reached. Start Over")    
+        st.stop()
+
+button("Forward", "Ctrl+ArrowRight", greet)
+
+# if st.button("Forward" , ):
+#     # st.dataframe(st.session_state.df1)
+#     # st.dataframe(st.session_state.df2)
+#     # fig=chart_25(st.session_state.df1)
+#     # st.plotly_chart(fig)
+#     st.write('Hello')
+#     st.session_state.total_rows= len(st.session_state.df2)
+#     st.write(st.session_state.total_rows)
+#     st.session_state.row_num = st.session_state.row_num + 1
+#     if st.session_state.row_num <= st.session_state.total_rows:
+#         sliced_df = st.session_state.df2.head(st.session_state.row_num)
+#         plot_df=pd.concat([st.session_state.df1,sliced_df], axis=0)
+#         fig=chart_25(plot_df)
+#         st.plotly_chart(fig)
+#     else:
+#         st.stop()
+
+
+with st.container():
+    if st.session_state.switch =='show':
+        show_initial_chart()
+        st.session_state.switch ='hide'
+
+
+with st.sidebar:
+    if st.button("Reset"):
+       st.session_state.row_num=0 
