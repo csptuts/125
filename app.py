@@ -102,17 +102,20 @@ with st.sidebar:
 
 def greet():
     st.session_state.total_rows= len(st.session_state.df2)
-    st.write(st.session_state.total_rows)
+    # st.write(st.session_state.total_rows)
     st.session_state.row_num = st.session_state.row_num + 1
     if st.session_state.row_num <= st.session_state.total_rows:
         sliced_df = st.session_state.df2.head(st.session_state.row_num)
         plot_df=pd.concat([st.session_state.df1,sliced_df], axis=0)
+        last_row = sliced_df.iloc[-1]
+        rsi=last_row.get(key = 'RSI') 
+        st.write(rsi)
         fig=chart_25(plot_df)
         st.plotly_chart(fig)
     else:
         st.stop()
 
-button("Forward", "Ctrl+ArrowRight", greet)
+button("Forward", "ArrowRight", greet)
 
 # if st.button("Forward" , ):
 #     # st.dataframe(st.session_state.df1)
