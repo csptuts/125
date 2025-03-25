@@ -8,28 +8,26 @@ import files.sessionvars
 from files.plotlyfig import chart_25, show_initial_chart
 
 # st.title('Hello')
-
 with st.sidebar:
-    
-    uploaded_file_W = st.file_uploader("Upload W data file")
-    
-    if uploaded_file_W is not None:
-        dfW = pd.read_csv(uploaded_file_W)
-
-with st.sidebar:
-    
-    uploaded_file_125 = st.file_uploader("Upload 125 data file")
-    
-    if uploaded_file_125 is not None:
-        df125_0 = pd.read_csv(uploaded_file_125)
-
-
-with st.sidebar:
-    
-    uploaded_file_25 = st.file_uploader("Upload 25 data file")
-    
-    if uploaded_file_25 is not None:
-        df25_0 = pd.read_csv(uploaded_file_25)
+    uploaded_files = st.file_uploader(
+        "Choose a CSV file", accept_multiple_files=True
+    )
+    for uploaded_file in uploaded_files:
+        # bytes_data = uploaded_file.read()
+        # st.write("filename:", uploaded_file.name)
+        # st.write(bytes_data)
+        if uploaded_file.name == "weekly.csv":
+            # uploaded_file.seek(0)
+            dfW = pd.read_csv(uploaded_file)
+            # st.dataframe(dfW)
+        if uploaded_file.name == "125m.csv":
+            # uploaded_file.seek(0)
+            df125_0 = pd.read_csv(uploaded_file)
+            # st.dataframe(df125_0)
+        if uploaded_file.name == "25m.csv":
+            # uploaded_file.seek(0)
+            df25_0 = pd.read_csv(uploaded_file)
+            # st.dataframe(df25_0)
 
 with st.sidebar:
     with st.form("my_form"):
