@@ -111,7 +111,8 @@ def greet():
         fig=chart_25(plot_df)
         st.plotly_chart(fig)
     else:
-        st.stop()
+       if st.button("Reset"):
+           st.session_state.row_num=0
 
 button("Forward", "ArrowRight", greet)
 
