@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 
 def uploader():
     uploaded_files = st.file_uploader(
