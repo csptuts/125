@@ -6,28 +6,10 @@ from files.wops import get_unixts
 from files.coredf import get_df25, get_df125
 import files.sessionvars
 from files.plotlyfig import chart_25, show_initial_chart
-
+from files.uploader import uploader
 # st.title('Hello')
 with st.sidebar:
-    uploaded_files = st.file_uploader(
-        "Choose a CSV file", accept_multiple_files=True
-    )
-    for uploaded_file in uploaded_files:
-        # bytes_data = uploaded_file.read()
-        # st.write("filename:", uploaded_file.name)
-        # st.write(bytes_data)
-        if uploaded_file.name == "weekly.csv":
-            # uploaded_file.seek(0)
-            dfW = pd.read_csv(uploaded_file)
-            # st.dataframe(dfW)
-        if uploaded_file.name == "125m.csv":
-            # uploaded_file.seek(0)
-            df125_0 = pd.read_csv(uploaded_file)
-            # st.dataframe(df125_0)
-        if uploaded_file.name == "25m.csv":
-            # uploaded_file.seek(0)
-            df25_0 = pd.read_csv(uploaded_file)
-            # st.dataframe(df25_0)
+    uploader()
 
 with st.sidebar:
     with st.form("my_form"):
