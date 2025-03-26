@@ -2,12 +2,12 @@ import streamlit as st
 import pandas as pd
 from streamlit_shortcuts import button, add_keyboard_shortcuts
 
+import files.sessionvars
 from files.wops import get_unixts
 from files.coredf import get_df25, get_df125
-import files.sessionvars
 from files.plotlyfig import chart_25, show_initial_chart
 from files.uploader import uploader
-# st.title('Hello')
+
 with st.sidebar:
     uploader()
 
