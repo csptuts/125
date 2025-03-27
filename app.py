@@ -121,8 +121,8 @@ with st.sidebar:
 #     else:
 #         st.stop()
 
-
-with st.container():
+if st.session_state.row_num <1:
+# with st.container():
     show_initial_chart()
     
 # with st.sidebar:
