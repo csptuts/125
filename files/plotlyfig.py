@@ -86,6 +86,6 @@ def chart_25(df):
     return fig
 
 
-def show_initial_chart():
-    fig=chart_25(st.session_state.df1)
-    st.plotly_chart(fig)
+# def show_initial_chart():
+#     fig=chart_25(st.session_state.df1)
+#     st.plotly_chart(fig)
