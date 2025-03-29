@@ -141,33 +141,33 @@ with st.sidebar:
 #         st.stop()
 
 
-# with st.container():
-#     show_initial_chart()
-    
-# with st.sidebar:
-#     if st.button("Reset"):
-#         st.session_state.row_num=0
+
 with st.sidebar:
     if st.button("Reset"):
         
         empty_df = pd.DataFrame(columns = ['TS-GMT'])
         if 'weekly_df_subset' not in st.session_state:
             st.session_state.weekly_df_subset = empty_df
+        else:
+            st.session_state.weekly_df_subset = empty_df
 
         if 'dfPrevWk' not in st.session_state:
             st.session_state.dfPrevWk = 0
+        else:
+            st.session_state.dfPrevWk = 0
 
         if 'dfCurrentWk' not in st.session_state:
-            st.session_state.dfCurrentWk = 0    
+            st.session_state.dfCurrentWk = 0
+        else:
+            st.session_state.dfCurrentWk = 0
 
         if 'row_num' not in st.session_state:
             st.session_state.row_num = 0
-
-
-        # if 'switch' not in st.session_state:
-        #     st.session_state.switch = 'hide'
+        else:
+            st.session_state.row_num=0 
 
         if 'total_rows' not in st.session_state:
             st.session_state.total_rows = 0
-
-        st.session_state.row_num=0 
+        else:
+            st.session_state.total_rows = 0
+        
