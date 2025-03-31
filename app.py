@@ -45,26 +45,53 @@ def get_df25(wk_unxts, df25_0):
   return df25
 
 def get_df125(wk_unxts, df125_0):
+  df125_0.rename(columns={'RSI': 'RSI125'}, inplace=True)
   plus=wk_unxts+604800
   minus=wk_unxts-604800
   df125 = df125_0[(df125_0['UNIXTS'] >= minus) & (df125_0['UNIXTS'] < plus)]
   df125.set_index('UNIXTS', inplace=True)
-  df125=df125[["RSI", "PP", "R1", "S1", "R2", "S2", ]]
+  df125=df125[["RSI125", "PP", "R1", "S1", "R2", "S2", ]]
   df125_cp = df125.copy()
-  df125_cp['RSI'] = df125_cp['RSI'].shift(1)
+  df125_cp['RSI125'] = df125_cp['RSI125'].shift(1)
   df125=df125_cp.copy()
   df125.dropna(inplace=True)
   return df125
-    
+
+def get_df75(wk_unxts, df75_0):
+  df75_0.rename(columns={'RSI': 'RSI75'}, inplace=True)
+  plus=wk_unxts+604800
+  minus=wk_unxts-604800
+  df75 = df75_0[(df75_0['UNIXTS'] >= minus) & (df75_0['UNIXTS'] < plus)]
+  df75.set_index('UNIXTS', inplace=True)
+  df75=df75[["RSI75", "Delta"]]
+  df75_cp = df75.copy()
+  df75_cp['RSI75'] = df75_cp['RSI75'].shift(1)
+  df75=df75_cp.copy()
+  df75.dropna(inplace=True)
+  return df75    
     
     
 def chart_25(df):
     
-  
-    fig = make_subplots(rows=2, cols=1, 
+    #get last row in Data Frame as df
+    last_row = df.iloc[-1:]
+    #get last row in Data Frame as Series
+    last_row_s = df.iloc[-1]
+    
+    last_rsi_75 =last_row_s.get(key = 'RSI75')
+    last_rsi_125 =last_row_s.get(key = 'RSI125')
+    # last_pp =last_row.get(key = 'PP')
+    # last_r1 =last_row.get(key = 'R1')
+    # last_r2 =last_row.get(key = 'R2')
+    # last_s1 =last_row.get(key = 'S1')
+    # last_s2 =last_row.get(key = 'S2')
+    last_close =last_row_s.get(key = 'Close')
+    last_delta = last_row_s.get(key= "Delta")
+
+    fig = make_subplots(rows=4, cols=1, 
                         shared_xaxes=True,
-                        vertical_spacing=0.01,
-                        row_heights=[1,0.1]
+                        vertical_spacing=0.05,
+                        row_heights=[1,0.2,0.2,0.2]
     )
 
  
@@ -76,12 +103,29 @@ def chart_25(df):
                 name="OHLC"),
                 row=1, col=1)
 
+    fig.add_trace(go.Scatter(x=last_row['TS-GMT'],# if you use last_row['TS-GMT'] you will get last value
+                             y=last_row['Close'],
+                             marker=dict(color='black',size=8),
+                             mode="text",
+                             textfont=dict(color='black', size=12),
+                             textposition='top right',
+                             text=last_close,
+                             name="Close"),
+                             row=1, col=1)
+
     fig.add_trace(go.Scatter(x=df['TS-GMT'],
                              y=df['PP'],
                              marker=dict(color='black',size=8),
                              mode="markers",
                              name="PP"),
                             row=1, col=1)
+    
+    # fig.add_trace(go.Scatter(x=df['TS-GMT'],
+    #                          y=last_pp,
+    #                          marker=dict(color='black',size=8),
+    #                          mode="markers+text",
+    #                          name="PPtext"),
+    #                         row=1, col=1)
     
     fig.add_trace(go.Scatter(x=df['TS-GMT'],
                              y=df['R1'],
@@ -90,12 +134,26 @@ def chart_25(df):
                              name="R1"),
                              row=1, col=1)
     
+    # fig.add_trace(go.Scatter(x=df['TS-GMT'],
+    #                          y=last_r1,
+    #                          marker=dict(color='orange',size=8),
+    #                          mode="markers+text",
+    #                          name="R1text"),
+    #                          row=1, col=1)
+    
     fig.add_trace(go.Scatter(x=df['TS-GMT'],
                              y=df['R2'],
                              marker=dict(color='orange',size=8),
                              mode="markers",
                              name="R2"),
                              row=1, col=1)
+    
+    # fig.add_trace(go.Scatter(x=df['TS-GMT'],
+    #                          y=last_r2,
+    #                          marker=dict(color='orange',size=8),
+    #                          mode="markers+text",
+    #                          name="R2text"),
+    #                          row=1, col=1)
     
     fig.add_trace(go.Scatter(x=df['TS-GMT'],
                              y=df['S1'],
@@ -118,15 +176,25 @@ def chart_25(df):
                              row=1, col=1)
 
     fig.add_trace(go.Scatter(x=df['TS-GMT'],
-                             y=df['RSI'],
-                             marker=dict(color='blue',size=4),
-                             mode="markers",
-                             name="RSI"),
+                             y=df['RSI75'],
+                             marker=dict(color='darkturquoise',size=4),
+                             mode="lines+markers",
+                             name="RSI75"),
+                             row=2, col=1)
+    
+    fig.add_trace(go.Scatter(x=df['TS-GMT'],
+                             y=last_row['RSI75'],
+                             marker=dict(color='red',size=2),
+                             mode="text",
+                             text=last_rsi_75,
+                             textfont=dict(color='black', size=12),
+                             textposition='middle center',
+                             name="RSI75text"),
                              row=2, col=1)
     
     fig.add_trace(go.Scatter(x=df['TS-GMT'],
                              y=df['60rsi'],
-                             line=dict(color='firebrick', width=1,dash='dash')),
+                             line=dict(color='firebrick', width=0.5,dash='dash')),
     row=2, col=1)
 
     fig.add_trace(go.Scatter(x=df['TS-GMT'],
@@ -134,6 +202,75 @@ def chart_25(df):
                              line=dict(color='firebrick', width=1,dash='dash')),
     row=2, col=1)
     
+    
+    fig.add_trace(go.Scatter(x=df['TS-GMT'],
+                             y=df['RSI125'],
+                             marker=dict(color='crimson',size=4),
+                             mode="lines+markers",
+                             name="RSI125"),
+                             row=3, col=1)
+    
+    fig.add_trace(go.Scatter(x=df['TS-GMT'],
+                             y=last_row['RSI125'],
+                             marker=dict(color='red',size=2),
+                             mode="text",
+                             text=last_rsi_125,
+                             textfont=dict(color='black', size=12),
+                             textposition='middle center',
+                             name="RSI125text"),
+                             row=3, col=1)
+    
+    fig.add_trace(go.Scatter(x=df['TS-GMT'],
+                             y=df['60rsi'],
+                             line=dict(color='aquamarine', width=1,dash='dash')),
+    row=3, col=1)
+
+    fig.add_trace(go.Scatter(x=df['TS-GMT'],
+                             y=df['40rsi'], 
+                             line=dict(color='aquamarine', width=1,dash='dash')),
+    row=3, col=1)
+
+    fig.add_trace(go.Scatter(x=df['TS-GMT'],
+                             y=df['Delta'],
+                             marker=dict(color='blue',size=4),
+                             mode="lines+markers",
+                             name="Delta"),
+                             row=4, col=1)
+
+    fig.add_trace(go.Scatter(x=df['TS-GMT'],
+                             y=last_row['Delta'],
+                             marker=dict(color='red',size=2),
+                             mode="text",
+                             text=last_delta,
+                             textfont=dict(color='black', size=12),
+                             textposition='middle center',
+                             name="lastDelta"),
+                             row=4, col=1)
+    
+    fig.add_trace(go.Scatter(x=df['TS-GMT'],
+                             y=df['10p'], 
+                             line=dict(color='firebrick', width=1,dash='dash')),
+    row=4, col=1)
+
+    fig.add_trace(go.Scatter(x=df['TS-GMT'],
+                             y=df['10m'], 
+                             line=dict(color='firebrick', width=1,dash='dash')),
+    row=4, col=1)
+
+    fig.add_trace(go.Scatter(x=df['TS-GMT'],
+                             y=df['20p'], 
+                             line=dict(color='firebrick', width=1,dash='dash')),
+    row=4, col=1)
+
+    fig.add_trace(go.Scatter(x=df['TS-GMT'],
+                             y=df['20m'], 
+                             line=dict(color='firebrick', width=1,dash='dash')),
+    row=4, col=1)
+
+    fig.update_yaxes(title_text="RSI 75", row=2, col=1)
+    fig.update_yaxes(title_text="RSI 125", row=3, col=1)
+    fig.update_yaxes(title_text="Delta", row=4, col=1)
+
     fig.update_layout(xaxis_rangeslider_visible=False)
     fig.update_layout(height=800, width=1200)
     fig.update_yaxes(dtick=100)
@@ -153,6 +290,8 @@ with st.sidebar:
                 df125_0 = pd.read_csv(uploaded_file)
             if uploaded_file.name == "25m.csv":
                 df25_0 = pd.read_csv(uploaded_file)
+            if uploaded_file.name == "75m.csv":
+                df75_0 = pd.read_csv(uploaded_file)    
 
 with st.sidebar:
     with st.form("date_input"):
@@ -181,9 +320,17 @@ with st.sidebar:
             wk_unxts=int(wk_unxts)
             df25=get_df25(wk_unxts, df25_0)
             df125=get_df125(wk_unxts, df125_0)
-            plot_data=pd.merge_asof(df25,df125,left_index=True,right_index=True)
+            df75=get_df75(wk_unxts, df75_0)
+
+            plot_data_0=pd.merge_asof(df25,df125,left_index=True,right_index=True)
+            plot_data=pd.merge_asof(plot_data_0,df75,left_index=True,right_index=True)
+            # st.dataframe(plot_data)
             plot_data['60rsi'] = 60
             plot_data['40rsi'] = 40
+            plot_data['20p'] = 20
+            plot_data['10p'] = 10
+            plot_data['10m'] = -10
+            plot_data['20m'] = -20
             unique_values = plot_data['IsoWeekNum'].unique()
             wa=unique_values[0]
             wb=unique_values[1]
@@ -214,9 +361,9 @@ def simulate():
     if st.session_state.row_num <= st.session_state.total_rows:
         sliced_df = st.session_state.dfCurrentWk.head(st.session_state.row_num)
         plot_df=pd.concat([st.session_state.dfPrevWk,sliced_df], axis=0)
-        last_row = sliced_df.iloc[-1]
-        rsi=last_row.get(key = 'RSI') 
-        st.write(rsi)
+        # last_row = sliced_df.iloc[-1]
+        # rsi=last_row.get(key = 'RSI') 
+        # st.write(rsi)
         fig=chart_25(plot_df)
         st.plotly_chart(fig)
         
